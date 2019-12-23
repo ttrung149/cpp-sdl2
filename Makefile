@@ -34,14 +34,14 @@ HEADERS  = src/all.h
 OBJECTS  = $(SOURCES:.c=.o)
 
 #  Compiler Flags
-CC 			= clang++
-CFLAGS      = -g -std=c++11 -pedantic -Wall -Werror -Wextra \
+CC 			= gcc 
+CFLAGS      = -g -std=c99 -pedantic -Wall -Werror -Wextra \
               -Wno-overlength-strings -Wfatal-errors -pedantic
 LDFLAGS     = -lSDL2
 CPPFLAGS    = -I.
 RM          = rm -f 
 
-%.o: %.cpp $(DEPS)
+%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CPPFLAGS) $(CFLAGS)
 
 clean: 
