@@ -2,9 +2,21 @@
 
 C/C++ visualization using SDL2
 
-## Installing
+## Prerequisites and installing
+
+Clone the repository. [SDL2](https://www.libsdl.org/download-2.0.php) is a prerequistes for the source files.
+
+To make all executables, run the following: 
+
+```sh
+make all
+```
 
 ## Docs
+
+Comprehensive list of visualizations implemented:
+
+* [Barnsley fern](https://en.wikipedia.org/wiki/Barnsley_fern)
 
 ## Authors
 
