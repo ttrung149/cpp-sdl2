@@ -12,6 +12,8 @@ To make all executables, run the following:
 make all
 ```
 
+All generated executables will be in `/bin` foloder.
+
 ## Docs
 
 Comprehensive list of visualizations implemented:
