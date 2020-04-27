@@ -48,7 +48,7 @@ const std::vector<std::vector<char> > maze = {
 
 /* Agent point of view attributes */
 const int agent_size = 5;
-const float pov = 3.14159 / 4;          // POV angle - pi/4
+const float pov = 3.14159 / 3;          // POV angle - pi/3
 const float max_depth = 15;             // Max distance that agent can see
 
 /* Render mini-map based on the agent position */
@@ -60,7 +60,7 @@ void render_minimap(SDL_Renderer *renderer, float x, float y, float a) {
         for (size_t col = 0; col < maze[0].size(); col++) {
             SDL_Rect tile;
             if (maze[col][row] == '#') {
-                SDL_SetRenderDrawColor(renderer, 150, 150, 150, 200);
+                SDL_SetRenderDrawColor(renderer, 50, 50, 150, 200);
                 tile.x = row * minimap_tile_size;
                 tile.y = col * minimap_tile_size;
                 tile.w = minimap_tile_size;
@@ -73,6 +73,8 @@ void render_minimap(SDL_Renderer *renderer, float x, float y, float a) {
                 tile.w = minimap_tile_size;
                 tile.h = minimap_tile_size;  
             }
+            
+            SDL_RenderFillRect(renderer, &tile);
             SDL_RenderDrawRect(renderer, &tile);
         }
     }
@@ -101,8 +103,21 @@ void render_minimap(SDL_Renderer *renderer, float x, float y, float a) {
 
 /* Render terrain based on the agent position and view angle */
 void render_terrain(SDL_Renderer *renderer, float x, float y, float a) {
+    // Generate floor
+    for (int r = w_height / 2; r < w_height; r += 3) {
+        SDL_Rect floor;
+        int color = r * 510 / w_height;
+        SDL_SetRenderDrawColor(renderer, color, color, color, 150); 
+        floor.x = 0;
+        floor.y = r;
+        floor.h = 3;
+        floor.w = w_width;
+        SDL_RenderFillRect(renderer, &floor);
+        SDL_RenderDrawRect(renderer, &floor);
+    }
+
     // Generate w_width number of rays for ray casting
-    for (int i = 0; i < w_width; ++i) {
+    for (int i = 0; i < w_width; i++) {
         // Limit ray angle from -POV/2 to +POV/2
         float ray_angle = a - pov / 2.0 + ((float)i / (float)w_width) * pov;
         
@@ -111,7 +126,7 @@ void render_terrain(SDL_Renderer *renderer, float x, float y, float a) {
 
         // Find distance from agent to wall in the direction of each ray
         while (!hit_wall && distance_to_wall < max_depth) {
-            distance_to_wall += 0.1;
+            distance_to_wall += 0.05;
 
             // Assume generated ray vector has the form [(x, y), (rx, ry)],
             // where x, y is the current coordinates of the agent.
@@ -134,7 +149,7 @@ void render_terrain(SDL_Renderer *renderer, float x, float y, float a) {
         // Render wall tile - The further the wall, the darker its color
         SDL_Rect wall;
         float w_color = (distance_to_wall < 1) ? 255 : 255 / distance_to_wall; 
-        SDL_SetRenderDrawColor(renderer, w_color, w_color, w_color, 200); 
+        SDL_SetRenderDrawColor(renderer, w_color, w_color, w_color, 255); 
         wall.x = i;
         wall.y = (w_height - w_height / distance_to_wall) / 2.0;
         wall.w = 1;
@@ -173,29 +188,48 @@ int main() {
                 stop_simulation = true;
                 break;
             
-            // @TODO: collision detection
             case SDL_KEYDOWN: {
                 switch (event.key.keysym.scancode)
                 {
-                    case SDL_SCANCODE_W:
-                        agent_pos_y += agent_speed * sinf(agent_pov);
-                        agent_pos_x += agent_speed * cosf(agent_pov);
+                    case SDL_SCANCODE_W: {
+                        float x = agent_pos_x;
+                        float y = agent_pos_y;
+                        y += agent_speed * sinf(agent_pov);
+                        x += agent_speed * cosf(agent_pov);
+
+                        if ((int)y > maze_size || (int)y < 0 || 
+                            (int)x > maze_size || (int)x < 0) {
+                            break;
+                        }
+
+                        if (maze[(int)y ][(int)x] != '#') {
+                            agent_pos_y = y;
+                            agent_pos_x = x;
+                        }
                         break;
-                    case SDL_SCANCODE_S:
-                        agent_pos_y -= agent_speed * sinf(agent_pov);
-                        agent_pos_x -= agent_speed * cosf(agent_pov);
+                    }
+                    case SDL_SCANCODE_S: {
+                        float x = agent_pos_x;
+                        float y = agent_pos_y;
+                        y -= agent_speed * sinf(agent_pov);
+                        x -= agent_speed * cosf(agent_pov);
+
+                        if ((int)y > maze_size || (int)y < 0 || 
+                            (int)x > maze_size || (int)x < 0) {
+                            break;
+                        }
+
+                        if (maze[(int)y][(int)x] != '#') {
+                            agent_pos_y = y;
+                            agent_pos_x = x;
+                        }
                         break;
+                    }
                     case SDL_SCANCODE_D:               
                         agent_pov += agent_rotate_speed;
                         break;
                     case SDL_SCANCODE_A:
                         agent_pov -= agent_rotate_speed;
-                        break;
-                    case SDL_SCANCODE_Q:
-                        agent_pos_x -= agent_speed;
-                        break;
-                    case SDL_SCANCODE_E:
-                        agent_pos_x += agent_speed;
                         break;
                     default:
                         break;
