@@ -30,6 +30,7 @@ clean:
 
 # Make all executables
 all:
+	make conway
 	make barnsley
 	make raycast
 
@@ -39,3 +40,6 @@ barnsley: src/barnsley-fern.o
 
 raycast: src/ray-casting.o
 	$(C++) $(LDFLAGS) -o bin/raycast src/ray-casting.o
+
+conway: src/conway.o
+	$(CC) $(LDFLAGS) -o bin/conway src/conway.o

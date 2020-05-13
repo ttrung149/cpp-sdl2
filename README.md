@@ -19,6 +19,7 @@ All generated executables will be in `/bin` foloder.
 Comprehensive list of visualizations implemented:
 
 * [Barnsley fern](https://en.wikipedia.org/wiki/Barnsley_fern)
+* [Conway's game of life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life)
 * [Ray-casting (Wolfenstein 3D)](https://en.wikipedia.org/wiki/Ray_casting)
 
 ## Authors
